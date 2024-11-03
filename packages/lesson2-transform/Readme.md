@@ -80,3 +80,14 @@ const cube3 = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasic
 cube3.position.x = 1.5;
 group.add(cube3);
 ```
+
+### Math behind the scenes
+
+Arithmetic operations are done using matrices. The matrix is a 4x4 array. The matrix is multiplied with the vector to get the new position.
+
+- **scalar** - are numbers
+- **vector** - are sequence of numbers
+- **matrix** - are sequence of vectors in same size
+- **tensor** - are sequence of matrices in same size
+
+Please read [Spatial Transformation Matrices](https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html)
