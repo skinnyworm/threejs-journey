@@ -1,76 +1,84 @@
-## Animation
+## Camera and Control
 
-### Project skeleton
+### Type of cameras in Three.js
+
+- **Array Camera** - It is a camera that is used to render a scene from multiple perspectives.
+- **Stereo Camera** - It renders a scene throw two camera to simulate human eyes. It is used in VR to create stero image.
+- **Cube Camera** - It is used to render a scene from the center of a cube. It is used to create environment map.
+- **Orthographic Camera** - It is used to render a scene without perspective. It is used in board game, architectural rendering.
+- **Perspective Camera** - It is used to render a scene with perspective. It is used in 3D games, 3D modeling.
+
+### Perspective camera
+
+A perspective camera is the most common camera in 3D graphics. It is used to render a scene with perspective. To create
+a perspective camera, you need to provide the
+
+- Field of view
+- Aspect ratio
+- Near and far plane.
 
 ```javascript
-import './style.css';
-import * as THREE from 'three';
-
-const sizes = {
-  width: 800,
-  height: 600,
-};
-
-const canvas = document.querySelector('canvas#webgl') as HTMLCanvasElement;
-const renderer = new THREE.WebGLRenderer({ canvas });
-renderer.setSize(sizes.width, sizes.height);
-
-const scene = new THREE.Scene();
-const axesHelper = new THREE.AxesHelper(2);
-scene.add(axesHelper);
-
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-material.wireframe = true;
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
-
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
-camera.position.z = 3;
-camera.lookAt(mesh.position);
-scene.add(camera);
-
-renderer.render(scene, camera);
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 1, 100);
 ```
 
-### requestAnimationFrame
+### OrthographicCamera
 
-Animation can be viewed as progression of object transformation. We call render at each frame to update the scene. The
-function that you request to be called at each frame is `requestAnimationFrame`.
+It different to the perspective camera. Object will have the same size regardless of the distance to the camera. There
+is no FOV in orthographic camera. Instead, your specify left, right, top, bottom, that the camera can see. Also you need
+to specify near and far plane.
 
-You provide a function to `requestAnimationFrame` as a callback. Then whenever the browser decide to show next frame, your
-callback function is invoked.
+```javascript
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
+```
 
-**Callback** function is a very common pattern in JavaScript. It is a function that is passed as an argument to another
-function. The function that receives the callback function will call it at some point. It is commonly used in event handling.
-For example, when you click a button, the browser will call the callback function that you provided to handle the application
-logic you want to do when the button is clicked. In this case, your code is hooked into the system event loop.
+### Control camera by mouse move
+
+#### Event handler
+
+Javascript is running on a single thread within a event loop in the browser window. When you move the mouse, the browser will fire an event to your javascript code. It will start to execute the code until it is finished, then it will pick up the next event and execute the code in that event handler. If you have a long running code, it will block the event loop and the browser will be unresponsive.
+
+We are going to listen to the mouse move event and update the camera position based on the mouse move.
+
+```javascript
+window.addEventListener('mousemove', (event) => {
+  console.log(event.clientX, event.clientY);
+});
+```
+
+**Remember** the event handler is a callback function provided to the addEventListener function. The event handler will be executed when the mouse move event is fired.
+
+This code will register a move move event listener function to the windows sytesm and get executed when the mouse move. The event object contains the clientX and clientY properties that represent the mouse position in the window.
+
+#### Normalize the mouse position
+
+The `clientX` and `clientY` are actual postion on the screen. We want to use a size independent position and between -0.5 and 0.5. We can use the following code to calculate the normalized position.
+
+```javascript
+const cursor = {
+  x: 0,
+  y: 0,
+};
+
+window.addEventListener('mousemove', (event) => {
+  cursor.x = event.clientX / sizes.width - 0.5;
+  cursor.y = -(event.clientY / sizes.height - 0.5);
+  console.log(cursor.x, cursor.y);
+});
+```
+
+**Think about** why we need to invert the y position? What is the range of the cursor.x and cursor.y?
+
+Now the cursor.x and cursor.y are values between -0.5 and 0.5, which represent the normalized position of the mouse.
+
+#### Update the camera position
+
+Finally we can update the camera position based on the mouse move by
+using the current custor position.
 
 ```javascript
 const tick = () => {
-  console.log('tick');
-  window.requestAnimationFrame(tick);
-};
-
-tick();
-```
-
-We provided a tick function to `requestAnimationFrame`. Within the tick function, we call `requestAnimationFrame` with
-tick again. So it will loop at each frame callback until the page is closed.
-
-### Frame rate
-
-Frame rate is the number of frames that are displayed in one second. It is measured in frames per second (fps). It was
-a characteristic of the display device. The frame rate is the number of frames that are displayed in one second. The higher
-the frame rate, the smoother the animation.
-
-On the display device, it is also called refresh rate. It is the number of times the display is updated per second. The
-gaming display can do 144Hz, normal display can do 60Hz, minimum is 30Hz. For example, at 144Hz, a 4K display need to
-draw a 4K image 144 times per second.
-
-```javascript
-const tick = () => {
-  mesh.rotation.y += 0.01;
+  camera.position.x = cursor.x * 5;
+  camera.position.y = cursor.y * 5;
   renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
 };
@@ -78,71 +86,58 @@ const tick = () => {
 tick();
 ```
 
-**Caution**: We moved `renderer.render` function call into the tick function.
+Above code move the camera on an XY plane.
 
-The above code will rotate the mesh at each frame. The mesh will rotate 0.01 radian at each frame. If the display is 60Hz,
-it will rotate 0.6 radian per second. If the display is 144Hz, it will rotate 1.44 radian per second.
-
-### Using clock
-
-There is a problem with the above code. The rotation speed is dependent on the display frame rate. User with different display
-will see different animation speed. We need to make the animation based on time, not frame rate.
-
-We can use javascript build in time function to get the time. We can use `Date.now()` to get the current time in milliseconds,
-and calcuate the difference between the current time and the last time to know how much time has passed. And then make sure the
-how much motion need to be updated during that time.
-
-**BUT** there is a better way to do this. We can use `THREE.Clock` to do this. It is a utility class that can be used to get
-time **elapsed** since the start of the clock. It is independent of the frame rate.
+**DIY:** How to move the camera around the origin on the XZ plane?
 
 ```javascript
-const clock = new THREE.Clock();
+camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 4;
+camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 4;
+```
+
+### Three.js build in controls
+
+Write a control could be tedious and error prone. Three.js provides a set of build in controls to help you control the camera.
+
+- **OrbitControls** - It allows you to orbit around a target point.
+- **FlyControls** - It is control the camera like a flight simulator. allow camera to rotate on 3 axis and move forward and backward.
+- **FirstPersonControls** - It is control the camera like a first person game. It allow camera to rotate on 2 axis and move forward and backward.
+- **PointerLockControls** - In FPS game, there are two set of controls. One is move the camera, another is lock the target while moving. This is the second type of control, lock the target and move.
+
+and many more.
+
+#### OrbitControls
+
+All the controls are in the `examples/jsm/controls`. You need to import the control you want to use.
+
+#### OrbitControls Example
+
+Move and drag the mouse to orbit around the target.
+
+```javascript
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+const controls = new OrbitControls(camera, canvas);
 
 const tick = () => {
-  const elapsedTime = clock.getElapsedTime();
-  mesh.rotation.y = elapsedTime;
-  console.log(elapsedTime);
-  window.requestAnimationFrame(tick);
-};
-
-tick();
-```
-
-Change the position in the tick function could also be fun.
-
-```javascript
-mesh.position.x = Math.cos(elapsedTime);
-mesh.position.y = Math.sin(elapsedTime);
-```
-
-### Tween functions with gsap
-
-Tween is a function that can be used to animate a value from one to another. It is a function that takes a value and a
-time than it produce a linear interpolation between the value. The linear interpolation can be seen as a curve, while x
-is the time, y is the value.
-
-- [easing function curve](https://easings.net/)
-
-_gsap_ is a library that can be used to do tweening. It is a very powerful library that can be used to do complex animation.
-
-- [gsap](https://greensock.com/gsap/)
-
-First, we need to install the library to our project.
-
-```javascript
-yarn add gsap
-```
-
-In last section we animated the position values in the tick function. We can use gsap to do the same thing. But as can
-make it animate faster in the beginning and slower at the end. We can use easing function to do this.
-
-```javascript
-gsap.to(mesh.position, { duration: 1, delay: 1, x: 2 });
-
-const tick = () => {
+  controls.update();
   renderer.render(scene, camera);
   window.requestAnimationFrame(tick);
 };
+```
 
-tick();
+#### FirstPersonControls Example
+
+Move the camera like a first person game using A,S,D,W keys.
+
+```javascript
+import { FirstPersonControls } from 'three/examples/jsm/controls/FirstPersonControls.js';
+
+const controls = new FirstPersonControls(camera, canvas);
+
+const tick = () => {
+  controls.update(0.01);
+  renderer.render(scene, camera);
+  window.requestAnimationFrame(tick);
+};
 ```
