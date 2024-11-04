@@ -1,5 +1,6 @@
 import './style.css';
 import * as THREE from 'three';
+import gsap from 'gsap';
 
 const sizes = {
   width: 800,
@@ -29,6 +30,7 @@ scene.add(camera);
 
 const clock = new THREE.Clock();
 
+// gsap.to(mesh.position, { duration: 1, delay: 1, x: 2 });
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
   mesh.rotation.y = elapsedTime;

@@ -116,3 +116,33 @@ mesh.position.y = Math.sin(elapsedTime);
 ```
 
 ### Tween functions with gsap
+
+Tween is a function that can be used to animate a value from one to another. It is a function that takes a value and a
+time than it produce a linear interpolation between the value. The linear interpolation can be seen as a curve, while x
+is the time, y is the value.
+
+- [easing function curve](https://easings.net/)
+
+_gsap_ is a library that can be used to do tweening. It is a very powerful library that can be used to do complex animation.
+
+- [gsap](https://greensock.com/gsap/)
+
+First, we need to install the library to our project.
+
+```javascript
+yarn add gsap
+```
+
+In last section we animated the position values in the tick function. We can use gsap to do the same thing. But as can
+make it animate faster in the beginning and slower at the end. We can use easing function to do this.
+
+```javascript
+gsap.to(mesh.position, { duration: 1, delay: 1, x: 2 });
+
+const tick = () => {
+  renderer.render(scene, camera);
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
