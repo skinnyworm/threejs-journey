@@ -1,93 +1,143 @@
-## Transform
+## Camera and Control
 
-### Introduction
+### Type of cameras in Three.js
 
-Transform means three things in computer graphics:
+- **Array Camera** - It is a camera that is used to render a scene from multiple perspectives.
+- **Stereo Camera** - It renders a scene throw two camera to simulate human eyes. It is used in VR to create stero image.
+- **Cube Camera** - It is used to render a scene from the center of a cube. It is used to create environment map.
+- **Orthographic Camera** - It is used to render a scene without perspective. It is used in board game, architectural rendering.
+- **Perspective Camera** - It is used to render a scene with perspective. It is used in 3D games, 3D modeling.
 
-- **Translation**: Move an object from one place to another.
-- **Rotation**: Rotate an object around a point.
-- **Scale**: Resize an object.
+### Perspective camera
 
-### Axes Helper
+A perspective camera is the most common camera in 3D graphics. It is used to render a scene with perspective. To create
+a perspective camera, you need to provide the
 
-The Axes helper will display the X, Y, and Z axes in the scene. This is useful for debugging purposes. 3 lines
-corresponding to x,y and z. X-axis is red, Y-axis is green, and Z-axis is blue.
-
-```javascript
-const axesHelper = new THREE.AxesHelper(2); // 2 is the size of the axes;
-scene.add(axesHelper);
-```
-
-### Translate
-
-Set position of an object in 3D space. Add offset to the position.
+- Field of view
+- Aspect ratio
+- Near and far plane.
 
 ```javascript
-mesh.position.x += 0.7;
-mesh.position.y -= 0.6;
-mesh.position.z += 1;
-
-camera.position.z = 5;
-camera.lookAt(mesh.position); // Camera will look at the mesh.
-console.log(mesh.position);
-console.log(mesh.position.length()); // 1.3601470508735443
-console.log(mesh.position.distanceTo(camera.position)); // 4.364630568559039
-console.log(mesh.position.normalize()); // Vector3 {x: 0.5146502354656655, y: -0.4411287732562847, z: 0.7352146220938078}
+const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 1, 100);
 ```
 
-- **length** is the distance from the origin.
-- **distanceTo** is the distance between two points.
-- **normalize** is the unit vector. (eg. length = 1)
+### OrthographicCamera
 
-### Scale
-
-Scale an object in 3D space. Scale on a **mesh** is a vector3 object. The default scale is (1,1,1). Each scale component should be positive value.
+It different to the perspective camera. Object will have the same size regardless of the distance to the camera. There
+is no FOV in orthographic camera. Instead, your specify left, right, top, bottom, that the camera can see. Also you need
+to specify near and far plane.
 
 ```javascript
-mesh.scale.x = 2;
-mesh.scale.y = 0.25;
-mesh.scale.z = 0.5;
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
 ```
 
-### Rotate
+### Control camera by mouse move
 
-Rotation is a bit tricky. It is done in radians. 360 degrees = 2 \* Math.PI. The rotation is done on the object's local axis.
+#### Event handler
+
+Javascript is running on a single thread within a event loop in the browser window. When you move the mouse, the browser will fire an event to your javascript code. It will start to execute the code until it is finished, then it will pick up the next event and execute the code in that event handler. If you have a long running code, it will block the event loop and the browser will be unresponsive.
+
+We are going to listen to the mouse move event and update the camera position based on the mouse move.
 
 ```javascript
-mesh.rotation.x = Math.PI * 0.25;
-mesh.rotation.y = Math.PI * 0.25;
+window.addEventListener('mousemove', (event) => {
+  console.log(event.clientX, event.clientY);
+});
 ```
 
-### Grouping
+**Remember** the event handler is a callback function provided to the addEventListener function. The event handler will be executed when the mouse move event is fired.
 
-You might want to group objects together. This is useful when you want to move, rotate, or scale multiple objects together.
+This code will register a move move event listener function to the windows sytesm and get executed when the mouse move. The event object contains the clientX and clientY properties that represent the mouse position in the window.
+
+#### Normalize the mouse position
+
+The `clientX` and `clientY` are actual postion on the screen. We want to use a size independent position and between -0.5 and 0.5. We can use the following code to calculate the normalized position.
 
 ```javascript
-const group = new THREE.Group();
-group.scale.y = 2;
-group.rotation.y = 0.2;
-scene.add(group);
+const cursor = {
+  x: 0,
+  y: 0,
+};
 
-const cube1 = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-cube1.position.x = -1.5;
-group.add(cube1);
-
-const cube2 = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-cube2.position.x = 0;
-group.add(cube2);
-
-const cube3 = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-cube3.position.x = 1.5;
-group.add(cube3);
+window.addEventListener('mousemove', (event) => {
+  cursor.x = event.clientX / sizes.width - 0.5;
+  cursor.y = -(event.clientY / sizes.height - 0.5);
+  console.log(cursor.x, cursor.y);
+});
 ```
 
-### Math behind the scenes
+**Think about** why we need to invert the y position? What is the range of the cursor.x and cursor.y?
 
-Arithmetic operations are done using matrices. The matrix is a 4x4 array. The matrix is multiplied with the vector to get the new position.
+Now the cursor.x and cursor.y are values between -0.5 and 0.5, which represent the normalized position of the mouse.
 
-- **scalar** - are numbers
-- **vector** - are sequence of numbers
-- **matrix** - are sequence of vectors in same size
-- **tensor** - are sequence of matrices in same size
+#### Update the camera position
 
-Please read [Spatial Transformation Matrices](https://www.brainvoyager.com/bv/doc/UsersGuide/CoordsAndTransforms/SpatialTransformationMatrices.html)
+Finally we can update the camera position based on the mouse move by
+using the current custor position.
+
+```javascript
+const tick = () => {
+  camera.position.x = cursor.x * 5;
+  camera.position.y = cursor.y * 5;
+  renderer.render(scene, camera);
+  window.requestAnimationFrame(tick);
+};
+
+tick();
+```
+
+Above code move the camera on an XY plane.
+
+**DIY:** How to move the camera around the origin on the XZ plane?
+
+```javascript
+camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 4;
+camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 4;
+```
+
+### Three.js build in controls
+
+Write a control could be tedious and error prone. Three.js provides a set of build in controls to help you control the camera.
+
+- **OrbitControls** - It allows you to orbit around a target point.
+- **FlyControls** - It is control the camera like a flight simulator. allow camera to rotate on 3 axis and move forward and backward.
+- **FirstPersonControls** - It is control the camera like a first person game. It allow camera to rotate on 2 axis and move forward and backward.
+- **PointerLockControls** - In FPS game, there are two set of controls. One is move the camera, another is lock the target while moving. This is the second type of control, lock the target and move.
+
+and many more.
+
+#### OrbitControls
+
+All the controls are in the `examples/jsm/controls`. You need to import the control you want to use.
+
+#### OrbitControls Example
+
+Move and drag the mouse to orbit around the target.
+
+```javascript
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+const controls = new OrbitControls(camera, canvas);
+
+const tick = () => {
+  controls.update();
+  renderer.render(scene, camera);
+  window.requestAnimationFrame(tick);
+};
+```
+
+#### FirstPersonControls Example
+
+Move the camera like a first person game using A,S,D,W keys.
+
+```javascript
+import { FirstPersonControls } from 'three/examples/jsm/controls/FirstPersonControls.js';
+
+const controls = new FirstPersonControls(camera, canvas);
+
+const tick = () => {
+  controls.update(0.01);
+  renderer.render(scene, camera);
+  window.requestAnimationFrame(tick);
+};
+```
