@@ -11,11 +11,10 @@ type Size2D = {
   height: number;
 };
 
-type Size3D = Size2D &{
+type Size3D = Size2D & {
   depth: number;
-}
+};
 
-  
 export const createScene = (options: { axisHelper?: Boolean }): THREE.Scene => {
   const scene = new THREE.Scene();
   if (options.axisHelper) {
@@ -25,20 +24,22 @@ export const createScene = (options: { axisHelper?: Boolean }): THREE.Scene => {
   return scene;
 };
 
+export const createBox = (options: { size?: Size3D; position?: Vector3; color?: number; wireFrame?: boolean }) => {
+  const {
+    size = {
+      width: 1,
+      height: 1,
+      depth: 1,
+    },
+    position = {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
+    color = 0xff0000,
+    wireFrame = false,
+  } = options;
 
-export const createBox = (options: {size?: Size3D, position?: Vector3, color?: number, wireFrame?:boolean}) => {
-  const { size = {
-    width: 1,
-    height: 1,
-    depth: 1,
-  }, position = {
-    x: 0,
-    y: 0,
-    z: 0,   
-  }, 
-  color = 0xff0000,
-  wireFrame = false  } = options;
-  
   const geometry = new THREE.BoxGeometry(size.width, size.height, size.depth);
   const material = new THREE.MeshBasicMaterial({ color });
   const mesh = new THREE.Mesh(geometry, material);
@@ -47,12 +48,8 @@ export const createBox = (options: {size?: Size3D, position?: Vector3, color?: n
   return mesh;
 };
 
-export const createPlane = (options: {size: Size2D, color: number, rotation?: Vector3}) => {
-  const {
-    size = {width: 1, height: 1}, 
-    color = 0xffffff,
-    rotation = {x: 0, y: 0, z: 0}
-  } = options;
+export const createPlane = (options: { size: Size2D; color: number; rotation?: Vector3 }) => {
+  const { size = { width: 1, height: 1 }, color = 0xffffff, rotation = { x: 0, y: 0, z: 0 } } = options;
 
   const geometry = new THREE.PlaneGeometry(size.width, size.height);
   const material = new THREE.MeshBasicMaterial({ color });
@@ -61,9 +58,9 @@ export const createPlane = (options: {size: Size2D, color: number, rotation?: Ve
   return plane;
 };
 
-export const createPerspectiveCamera = (options: {initialPosition?: Vector3, fov?: number, aspectRatio: number}) => {
-  const {initialPosition={x:0, y:0, z:0}, fov=75, aspectRatio}  = options
+export const createPerspectiveCamera = (options: { initialPosition?: Vector3; fov?: number; aspectRatio: number }) => {
+  const { initialPosition = { x: 0, y: 0, z: 0 }, fov = 75, aspectRatio } = options;
   const camera = new THREE.PerspectiveCamera(fov, aspectRatio);
   camera.position.set(initialPosition.x, initialPosition.y, initialPosition.z);
   return camera;
-}
+};
