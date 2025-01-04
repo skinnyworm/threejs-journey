@@ -1,0 +1,20 @@
+{
+  "name": "lesson6-geometry-and-gui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "~5.6.2",
+    "vite": "^5.4.10"
+  },
+  "dependencies": {
+    "@types/three": "^0.169.0",
+    "lil-gui": "^0.20.0",
+    "three": "^0.170.0"
+  }
+}
