@@ -28,9 +28,49 @@ For the easy of calculation, some of the material determines the color of the pi
 - **alphaMap** - The texture of the material that is used to determine the opacity of the pixel.
 - **side** - Render single side or both side of the face. Default is THREE.FrontSide, where is the upper direction of the normal of the face.
 
+The color of the pixel is determined by the color of the material. The color of the pixel is not affected by the light. You can optional supply a color map (texture) to determine the color of each pixel. You can also supply an alpha map (texture) to determine the opacity of each pixel.
+
+```javascript
+const material = new THREE.MeshBasicMaterial();
+material.color = new THREE.Color('#f00');
+material.wireframe = false;
+material.transparent = true;
+material.opacity = 0.5;
+```
+
 #### MeshNormalMaterial
 
+This material is used to visualize the normal of the face. The color of the pixel is determined by the angle between the normal of the face and the camera.
+
+To better understand the normal of a face, we can use flat shadding to see the solid color of each face.
+
+If the normal is direct toward the camera, the color of the pixel is blue. If the normal is perpendicular downwards the camera, the color of the pixel is red. If the normal is perpendicular upwards to the camera, the color of the pixel is green.
+
+```javascript
+const material = new THREE.MeshNormalMaterial();
+material.wireframe = false;
+material.flatShading = true;
+material.side = THREE.FrontSide;
+```
+
 #### MeshMatcapMaterial
+
+MeshMatcapMaterial is a material that use a special texture to determine the color of the pixel. The texture is called `matcap` or `lit sphere`. The color of the pixel is first determined by the angle between the normal of the face and the camera, it then uses the `matcap` texture as a lookup table to determine the color of the pixel.
+
+[mapcap texture](https://www.alecjacobson.com/weblog/media/skin.png)!
+
+You can use this simple material to create realistic looking object without the need of light. And the performance is way better than the material that need light.
+
+Think about the `MeshMatcapMaterial` is just like a `MeshNOrmalMaterial` with a lookup table. Instead of renderring the color in reddish, bluish or greenish, it uses the `matcap` texture to determine the color of the pixel.
+
+```javascript
+import skin from './assets/skin.png';
+const textureLoader = new THREE.TextureLoader();
+const matcapTexture = textureLoader.load(skin);
+
+const material = new THREE.MeshMatcapMaterial();
+material.matcap = matcapTexture;
+```
 
 #### MeshDepthMaterial
 
@@ -45,3 +85,7 @@ For the easy of calculation, some of the material determines the color of the pi
 #### MeshStandardMaterial
 
 #### MeshPhysicalMaterial
+
+```
+
+```
