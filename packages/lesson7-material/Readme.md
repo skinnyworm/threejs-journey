@@ -57,7 +57,8 @@ material.side = THREE.FrontSide;
 
 MeshMatcapMaterial is a material that use a special texture to determine the color of the pixel. The texture is called `matcap` or `lit sphere`. The color of the pixel is first determined by the angle between the normal of the face and the camera, it then uses the `matcap` texture as a lookup table to determine the color of the pixel.
 
-[mapcap texture](https://www.alecjacobson.com/weblog/media/skin.png)!
+![skin mapcap texture](https://www.alecjacobson.com/weblog/media/skin.png)
+![red mapcap texture](https://www.alecjacobson.com/weblog/media/red.png)
 
 You can use this simple material to create realistic looking object without the need of light. And the performance is way better than the material that need light.
 
