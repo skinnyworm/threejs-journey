@@ -157,16 +157,41 @@ material.color = new THREE.Color(0x2194ce);
 
 #### MeshStandardMaterial
 
+The MeshStandardMaterial in Three.js uses **[physically based rendering](https://marmoset.co/posts/basic-theory-of-physically-based-rendering)** principles short for **PBR**, which means that the color of the pixel is determined by the reflection of the light and the nature of the object material. Many of this material's properties are based on the **metallic-roughness** workflow.
+
+- **roughness** : How rough the material appears. 0.0 means a smooth mirror reflection, 1.0 means fully diffuse.
+- **metalness** : How much the material is like a metal. Non-metallic materials such as wood or stone use 0.0, metallic use 1.0, with nothing (usually) in between.
+
+```javascript
+const material = new THREE.MeshStandardMaterial();
+material.color = new THREE.Color('#f00');
+material.metalness = 0.45;
+material.roughness = 0;
+```
+
+##### Enivronment Map
+
+The reflection of the light are quite complicated. We will add an environment map to the scene to simulate the reflection of the light.
+
+```javascript
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+
+export function loadEnvironmentMap(scene: THREE.Scene, path: string) {
+  const rgbeLoader = new RGBELoader();
+  rgbeLoader.load(path, (environmentMap) => {
+    environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+    scene.environment = environmentMap;
+    scene.background = environmentMap;
+  });
+}
+
+loadEnvironmentMap(scene, './assets/venice_sunset_1k.hdr');
+```
+
+Once we've added the environment map, the object will reflect the light from the environment.
+
 #### MeshPhysicalMaterial
 
-```
+The MeshPhysicalMaterial is an extension of the MeshStandardMaterial. It is a physically based rendering material that is based on the **metallic-roughness** workflow. It also includes properties for **transparency**, **emissive**, **clearcoat**, **clearcoatRoughness**, **reflectivity**, **refractionRatio**, **ior**
 
-```
-
-```
-
-```
-
-```
-
-```
+We will cover more about the material in the next lesson, when we talk about light and texture.
