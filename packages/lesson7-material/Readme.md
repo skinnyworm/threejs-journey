@@ -75,17 +75,97 @@ material.matcap = matcapTexture;
 
 #### MeshDepthMaterial
 
+This material is used to visualize the depth of the object. The color of the pixel is determined by the distance between the camera and the object. The closer the object is to the camera, the brighter the color of the pixel.
+
+The rendered image is in grayscale. It can be used as **depth map** for **post-processing** and **composition**.
+
+```javascript
+const material = new THREE.MeshLambertMaterial();
+```
+
 ### Material that need light to reflect its color
+
+To create a more realistic looking object, we need to consider the light that hit the object. The color of the pixel is determined by the reflection of the light and the nature of the object material.
+
+From this section, we are going to introduce few materials that need light to reflect its color. To prepare for the scene, we need to add two lights to the scene.
+
+- AmbientLight - 环境光源，可以想象成是一团雾，光在微小的粒子中相互漫反射，最终形成一个均匀的光照。
+- PointLight - 点光源，光源是一个点，光线是从这个点向四面八方发射的。太阳就是一个典型的点光源。
+
+we will disccuss more about the light in the next lesson.
+
+```javascript
+// 环境光源 没有位置的概念，所有的物体接受的光强一致
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+scene.add(ambientLight);
+
+// 点光源 有一个位置的概念，物体接受辐射的能量与距离光源的距离成平方反比，即光强随距离的平方衰减
+const pointLight = new THREE.PointLight(0xffffff, 30);
+pointLight.position.x = 2;
+pointLight.position.y = 3;
+pointLight.position.z = 4;
+scene.add(pointLight);
+```
 
 #### MeshLambertMaterial
 
+This material is not physical based. The color of the pixel is determined by the angle between the normal of the face and the light. The color of the pixel is calculated by the **Lambertian reflectance** model.
+
+The Lambertian reflectance model is a simple model that assumes the light is reflected equally in all directions. The color of the pixel is determined by the angle between the normal of the face and the light. The color of the pixel is brighter when the angle is closer to 0 degree and darker when the angle is closer to 90 degree.
+
+[朗伯余弦定律](https://zh.wikipedia.org/wiki/%E6%9C%97%E4%BC%AF%E4%BD%99%E5%BC%A6%E5%AE%9A%E5%BE%8B)是光学中的一个基本定律，描述了光线照射到物体表面上时，光线与法线的夹角与反射光线的强度之间的关系。朗伯余弦定律表明，光线照射到物体表面上时，光线与法线的夹角越小，反射光线的强度越大。这是一个简化了的反射模型，仅适合漫反射的情况，即物体表面比较粗糙，反射光线在各个方向上都有可能。对镜子和金属等光滑表面，朗伯余弦定律不再适用，因为反射角可以是平行的而非在每个方向。
+
+However, this model consider the angle between the normal and the light only. It doesn't consider the angle between the normal and the camera. The color of the pixel is the same no matter how you rotate the camera.
+
+```javascript
+const material = new THREE.MeshLambertMaterial();
+material.color = new THREE.Color(0x2194ce);
+```
+
+If you look closely, you can see the color at the edge of the object is darker than the color at the center of the object. This is because the angle between the normal of the face and the light is larger at the edge of the object.
+
 #### MeshPhongMaterial
 
+This material is also not physical based. The color of the pixel is determined by the angle between the normal and the light. The color of the pixel is calculated by the **Phong reflectance model**.
+
+Compare to the Lambertian reflectance model, the Phong reflectance model **also consider the angle between the normal and the camera**.
+
+In Three.js, the `MeshPhongMaterial` is using **Blinn-Phong** reflectance model. An optimized version of the original Phong reflectance model. [局部光照模型(Blinn-Phong 反射模型)与着色方法(Phong Shading)](https://blog.csdn.net/qq_38065509/article/details/105691559)
+
+- **shininess** - The shininess of the material. The higher the value, the smaller the highlight. Default is 30.
+- **specular** - The color of the highlight. Default is white.
+
+```javascript
+const material = new THREE.MeshPhongMaterial();
+material.color = new THREE.Color(0x2194ce);
+material.specular = new THREE.Color(0x1188ff);
+material.shininess = 100;
+```
+
+You should notice that the highlight is smaller when the shininess is larger. Can the color will change along with the camera.
+
 #### MeshToonMaterial
+
+This material is simlar to the `MeshLambertMaterial`. The color between 'Light' and 'Dark' is not continuous. The color is divided into several levels. Like you drawing a cartoon, you are very likely using solid color to fill the object, instead of using gradient color.
+
+Unlike the `MeshLambertMaterial`, the `MeshToonMaterial` do consider the angle between the normal and the camera. You can observe that the color changed when the object/camera relative angle are changed.
+
+```javascript
+const material = new THREE.MeshToonMaterial();
+material.color = new THREE.Color(0x2194ce);
+```
 
 #### MeshStandardMaterial
 
 #### MeshPhysicalMaterial
+
+```
+
+```
+
+```
+
+```
 
 ```
 
