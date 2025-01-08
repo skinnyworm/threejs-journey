@@ -21,3 +21,9 @@ The alpha texture is a grayscale image in a scale between transparent and opaque
 The height texture is a grayscale image, each pixel is 8 bits (0 - 255). It will be used to define the height of the corresponding pixel on the geometry. Given 0 is flat, 255 should have the higest scale of height at that pixel. eg. a bump map or displacement map that will raise the surface of the geometry. It is used to simulate the landscape with uneven surface.
 
 <img src="https://github.com/skinnyworm/threejs-journey/blob/main/packages/lesson8-texture/public/textures/door/height.jpg" width="300" alt="height-map">
+
+#### Normal
+
+We have discussed normal a lot in previous lessons. Each pixel of the normal texture represent the normal vector at that pixel. Since a normal vector is a 3D unit vector, it requires 3 vaule to represent the scale of x, y, z. For example (0, 0, 1) is the normal vector that points upwards alone to the z-axis. Given each pixel of the texture has 3 values, it is very common to use RGB format to represent the normal vector. With blue is pointing to the z-axis, red is pointing to the x-axis, and green is pointing to the y-axis.
+
+<img src="https://github.com/skinnyworm/threejs-journey/blob/main/packages/lesson8-texture/public/textures/door/normal.jpg" width="300" alt="normal-map">
