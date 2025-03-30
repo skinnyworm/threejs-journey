@@ -27,3 +27,21 @@ The height texture is a grayscale image, each pixel is 8 bits (0 - 255). It will
 We have discussed normal a lot in previous lessons. Each pixel of the normal texture represent the normal vector at that pixel. Since a normal vector is a 3D unit vector, it requires 3 vaule to represent the scale of x, y, z. For example (0, 0, 1) is the normal vector that points upwards alone to the z-axis. Given each pixel of the texture has 3 values, it is very common to use RGB format to represent the normal vector. With blue is pointing to the z-axis, red is pointing to the x-axis, and green is pointing to the y-axis.
 
 <img src="https://github.com/skinnyworm/threejs-journey/blob/main/packages/lesson8-texture/public/textures/door/normal.jpg" width="300" alt="normal-map">
+
+#### Ambient Occlusion
+
+The normal texture can be used to reflect light to different direction on the surface. However, in case the ambient light the normal won't have that effect. The ambient occlusion texture is a grayscale image, each pixel is 8 bits (0 - 255). It will be used to define the occlusion of the corresponding pixel on the geometry. The darker the pixel, the more occluded it is. It is used to simulate the shadow effect on the surface in diffusing light.
+
+<img src="https://github.com/skinnyworm/threejs-journey/blob/main/packages/lesson8-texture/public/textures/door/ambientOcclusion.jpg" width="300" alt="ambient-occlusion-map">
+
+#### Metalness
+
+The metalness texture is a grayscale image, each pixel is 8 bits (0 - 255). It will be used to define the metalness of the corresponding pixel on the geometry. The darker the pixel, the more metallic it is. It is used to simulate the metal effect on the surface.
+
+<img src="https://github.com/skinnyworm/threejs-journey/blob/main/packages/lesson8-texture/public/textures/door/metalness.jpg" width="300" alt="metalness-map">
+
+#### Roughness
+
+The roughness texture is a grayscale image, each pixel is 8 bits (0 - 255). It will be used to define the roughness of the corresponding pixel on the geometry. The darker the pixel, the rougher it is. It is used to simulate the roughness effect on the surface.
+
+<img src="https://github.com/skinnyworm/threejs-journey/blob/main/packages/lesson8-texture/public/textures/door/roughness.jpg" width="300" alt="roughness-map">
