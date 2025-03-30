@@ -7,9 +7,11 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 const { renderer, scene, camera, canvas } = initScene({ axisHelper: true });
 
 // Create buffered geometry
-const geometry = new THREE.BufferGeometry();
+
 const positionsArray = new Float32Array([0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0]);
 const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
+
+const geometry = new THREE.BufferGeometry();
 geometry.setAttribute('position', positionsAttribute);
 
 const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });

@@ -18,6 +18,7 @@ const pointLight = new THREE.PointLight(0xffffff, 30);
 pointLight.position.x = 2;
 pointLight.position.y = 3;
 pointLight.position.z = 4;
+pointLight.intensity = 100;
 scene.add(pointLight);
 
 // Material
@@ -63,3 +64,4 @@ gui.add(material, 'wireframe').name('wireframe');
 gui.add(material, 'flatShading').name('flatShading');
 gui.add(animSpeed, 'x').min(-1).max(1).step(0.1).name('rotation x speed');
 gui.add(animSpeed, 'y').min(-1).max(1).step(0.1).name('rotation y speed');
+gui.add(pointLight, 'intensity').min(0).max(100).step(1).name('point light intensity');

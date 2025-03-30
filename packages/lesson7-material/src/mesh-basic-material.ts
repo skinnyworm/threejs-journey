@@ -11,7 +11,7 @@ const material = new THREE.MeshBasicMaterial();
 material.color = new THREE.Color('#f00');
 material.wireframe = false;
 material.transparent = true;
-material.opacity = 0.5;
+material.opacity = 0.9;
 
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), material);
 sphere.position.x = -1.5;
